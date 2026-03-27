@@ -41,6 +41,10 @@ jobs:
         run: |
           git config user.name "manga-affiliate-bot"
           git config user.email "bot@github-actions"
-          git add astro-blog/src/content/manga/
-          git diff --cached --quiet || git commit -m "🤖 週次新刊記事を自動生成 $(date '+%Y-%m-%d')"
-          git push
+          git add astro-blog/src/content/manga/ || true
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "🤖 週次新刊記事を自動生成 $(date '+%Y-%m-%d')"
+            git push
+          fi
