@@ -1,0 +1,39 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+export async function getStaticPaths() {
+  const mangaEntries = await getCollection("manga");
+  return mangaEntries.map((entry) => ({
+    params: { slug: entry.slug },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await entry.render();
+---
+
+<BaseLayout title={entry.data.title}>
+  <main class="max-w-3xl mx-auto px-4 py-10">
+    <a href="/" class="text-blue-600 hover:underline text-sm mb-6 inline-block">
+      ← 一覧に戻る
+    </a>
+
+    <article class="prose prose-lg max-w-none">
+      <Content />
+    </article>
+
+    <div class="mt-10 p-6 bg-blue-50 rounded-xl text-center">
+      <p class="text-lg font-semibold mb-4">この漫画をチェックする</p>
+      <a
+        href={entry.data.affiliate_url}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="inline-block bg-yellow-400 hover:bg-yellow-500 text-black font-bold px-6 py-3 rounded-lg transition"
+      >
+        Amazonで見る
+      </a>
+    </div>
+  </main>
+</BaseLayout>

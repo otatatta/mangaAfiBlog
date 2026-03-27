@@ -1,0 +1,45 @@
+name: 週次 漫画アフィリエイトBot
+
+on:
+  schedule:
+    - cron: "0 0 * * 1"  # 毎週月曜 09:00 JST (UTC 00:00)
+  workflow_dispatch:      # 手動実行も可能
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: リポジトリをチェックアウト
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+
+      - name: Python セットアップ
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: 依存パッケージをインストール
+        run: |
+          cd bot
+          pip install -r requirements.txt
+
+      - name: Botを実行
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          AMAZON_ASSOCIATE_TAG: ${{ secrets.AMAZON_ASSOCIATE_TAG }}
+        run: |
+          cd bot
+          python main.py
+
+      - name: 生成された記事をコミット＆プッシュ
+        run: |
+          git config user.name "manga-affiliate-bot"
+          git config user.email "bot@github-actions"
+          git add astro-blog/src/content/manga/
+          git diff --cached --quiet || git commit -m "🤖 週次新刊記事を自動生成 $(date '+%Y-%m-%d')"
+          git push

@@ -1,0 +1,40 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const allManga = await getCollection("manga");
+const sorted = allManga.sort(
+  (a, b) => new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime()
+);
+---
+
+<BaseLayout title="今週の新刊漫画まとめ | アフィリエイトブログ">
+  <main class="max-w-4xl mx-auto px-4 py-10">
+    <h1 class="text-3xl font-bold mb-2">📚 今週の新刊漫画まとめ</h1>
+    <p class="text-gray-500 mb-8">毎週月曜更新・アフィリエイトリンクあり</p>
+
+    <div class="grid gap-6">
+      {sorted.map((entry) => (
+        <a
+          href={`/manga/${entry.slug}`}
+          class="block border rounded-xl p-5 hover:shadow-md transition"
+        >
+          <div class="flex items-center gap-3 mb-2">
+            <span class="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
+              {entry.data.genre}
+            </span>
+            <span class="text-xs text-gray-400">{entry.data.pubDate}</span>
+          </div>
+          <h2 class="text-xl font-semibold mb-1">{entry.data.title}</h2>
+          <p class="text-gray-600 text-sm mb-3">{entry.data.description}</p>
+          <div class="flex items-center gap-4 text-sm text-gray-500">
+            <span>
+              期待値: {"★".repeat(entry.data.expectation_score)}{"☆".repeat(5 - entry.data.expectation_score)}
+            </span>
+            <span>話題性: {entry.data.buzz_level}</span>
+          </div>
+        </a>
+      ))}
+    </div>
+  </main>
+</BaseLayout>
