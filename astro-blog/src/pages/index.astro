@@ -7,6 +7,8 @@ const sorted = allManga.sort(
   (a, b) => new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime()
 );
 
+const genres = [...new Set(sorted.map((e) => e.data.genre))];
+
 const buzzColor = (level: string) => {
   switch (level) {
     case "高": return "bg-rose-500/20 text-rose-300 border-rose-500/30";
@@ -28,13 +30,34 @@ const buzzColor = (level: string) => {
       </p>
     </section>
 
+    <!-- Genre Filter -->
+    {genres.length > 1 && (
+      <div class="flex items-center gap-3 mb-8 flex-wrap" id="genre-filter">
+        <button
+          data-genre="all"
+          class="genre-btn active text-sm font-medium px-4 py-2 rounded-full border transition-all duration-200"
+        >
+          すべて
+        </button>
+        {genres.map((genre) => (
+          <button
+            data-genre={genre}
+            class="genre-btn text-sm font-medium px-4 py-2 rounded-full border transition-all duration-200"
+          >
+            {genre}
+          </button>
+        ))}
+      </div>
+    )}
+
     <!-- Manga Grid -->
     {sorted.length > 0 ? (
-      <div class="grid md:grid-cols-2 gap-5">
+      <div class="grid md:grid-cols-2 gap-5" id="manga-grid">
         {sorted.map((entry) => (
           <a
             href={`/manga/${entry.slug}`}
-            class="group relative bg-zinc-900 border border-zinc-800 rounded-2xl p-6 hover:border-violet-500/50 hover:bg-zinc-900/80 transition-all duration-300"
+            data-genre={entry.data.genre}
+            class="manga-card group relative bg-zinc-900 border border-zinc-800 rounded-2xl p-6 hover:border-violet-500/50 hover:bg-zinc-900/80 transition-all duration-300"
           >
             <div class="absolute inset-0 rounded-2xl bg-gradient-to-br from-violet-500/5 to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
@@ -80,5 +103,49 @@ const buzzColor = (level: string) => {
         <p class="text-zinc-500 text-sm mt-2">次回の月曜更新をお待ちください。</p>
       </div>
     )}
+
+    <style>
+      .genre-btn {
+        border-color: rgb(63 63 70); /* zinc-700 */
+        color: rgb(161 161 170); /* zinc-400 */
+        background: transparent;
+      }
+      .genre-btn:hover {
+        border-color: rgb(139 92 246 / 0.5); /* violet-500/50 */
+        color: rgb(196 181 253); /* violet-300 */
+      }
+      .genre-btn.active {
+        background: rgb(139 92 246 / 0.2);
+        border-color: rgb(139 92 246 / 0.5);
+        color: rgb(196 181 253);
+      }
+      .manga-card.hidden-by-filter {
+        display: none;
+      }
+    </style>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const buttons = document.querySelectorAll<HTMLButtonElement>(".genre-btn");
+        const cards = document.querySelectorAll<HTMLAnchorElement>(".manga-card");
+
+        buttons.forEach((btn) => {
+          btn.addEventListener("click", () => {
+            const genre = btn.dataset.genre;
+
+            buttons.forEach((b) => b.classList.remove("active"));
+            btn.classList.add("active");
+
+            cards.forEach((card) => {
+              if (genre === "all" || card.dataset.genre === genre) {
+                card.classList.remove("hidden-by-filter");
+              } else {
+                card.classList.add("hidden-by-filter");
+              }
+            });
+          });
+        });
+      });
+    </script>
   </main>
 </BaseLayout>
