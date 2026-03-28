@@ -7,7 +7,7 @@ export async function getStaticPaths() {
   const seriesNames = [...new Set(allManga.map((e) => e.data.series))];
 
   return seriesNames.map((name) => ({
-    params: { name: encodeURIComponent(name) },
+    params: { name: name.toLowerCase().replace(/\s+/g, "-") },
     props: {
       seriesName: name,
       entries: allManga

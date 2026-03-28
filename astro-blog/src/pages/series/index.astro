@@ -22,7 +22,7 @@ const seriesList = [...seriesMap.entries()]
     );
     return {
       name,
-      slug: encodeURIComponent(name),
+      slug: name.toLowerCase().replace(/\s+/g, "-"),
       entries: sorted,
       latest: sorted[0],
       count: sorted.length,
