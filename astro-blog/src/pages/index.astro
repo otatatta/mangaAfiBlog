@@ -57,10 +57,20 @@ const buzzColor = (level: string) => {
           <a
             href={`/manga/${entry.slug}`}
             data-genre={entry.data.genre}
-            class="manga-card group relative bg-white border border-gray-200 rounded-2xl p-6 hover:border-violet-300 hover:shadow-lg hover:shadow-violet-100/50 transition-all duration-300"
+            class="manga-card group flex gap-5 bg-white border border-gray-200 rounded-2xl p-5 hover:border-violet-300 hover:shadow-lg hover:shadow-violet-100/50 transition-all duration-300"
           >
-            <div class="relative">
-              <div class="flex items-center gap-2 mb-3 flex-wrap">
+            {entry.data.cover_image && (
+              <div class="shrink-0">
+                <img
+                  src={entry.data.cover_image}
+                  alt={entry.data.title}
+                  class="w-24 h-36 object-cover rounded-lg shadow-sm group-hover:shadow-md transition-shadow"
+                  loading="lazy"
+                />
+              </div>
+            )}
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-2 flex-wrap">
                 <span class="text-xs font-medium bg-violet-100 text-violet-700 border border-violet-200 px-2.5 py-1 rounded-full">
                   {entry.data.genre}
                 </span>
@@ -70,11 +80,11 @@ const buzzColor = (level: string) => {
                 <span class="text-xs text-gray-400 ml-auto">{entry.data.pubDate}</span>
               </div>
 
-              <h2 class="text-xl font-bold mb-2 text-gray-900 group-hover:text-violet-600 transition-colors">
+              <h2 class="text-lg font-bold mb-1 text-gray-900 group-hover:text-violet-600 transition-colors">
                 {entry.data.title}
               </h2>
 
-              <p class="text-gray-500 text-sm mb-4 line-clamp-2">
+              <p class="text-gray-500 text-sm mb-3 line-clamp-2">
                 {entry.data.description}
               </p>
 

@@ -1,6 +1,7 @@
 ---
 title: "あかね噺 15巻"
 series: "あかね噺"
+cover_image: "https://m.media-amazon.com/images/I/81yxkVH2rQL._SY522_.jpg"
 description: "落語の世界で頂点を目指すあかねの挑戦。真打昇進試験編がいよいよ佳境を迎える。"
 pubDate: "2026-03-18"
 genre: "少年漫画"

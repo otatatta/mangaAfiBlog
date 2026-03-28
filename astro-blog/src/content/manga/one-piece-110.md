@@ -1,6 +1,7 @@
 ---
 title: "ONE PIECE 110巻"
 series: "ONE PIECE"
+cover_image: "https://m.media-amazon.com/images/I/81JViVe0K7L._SY522_.jpg"
 description: "エルバフ編が本格始動！麦わらの一味がたどり着いた巨人の国で新たな冒険が幕を開ける。ロキの真意とは？"
 pubDate: "2026-03-04"
 genre: "少年漫画"

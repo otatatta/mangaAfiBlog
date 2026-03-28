@@ -53,8 +53,18 @@ const buzzColor = (level: string) => {
       {entries.map((entry) => (
         <a
           href={`/manga/${entry.slug}`}
-          class="group flex items-center gap-5 bg-white border border-gray-200 rounded-2xl p-5 hover:border-violet-300 hover:shadow-lg hover:shadow-violet-100/50 transition-all duration-300"
+          class="group flex gap-5 bg-white border border-gray-200 rounded-2xl p-5 hover:border-violet-300 hover:shadow-lg hover:shadow-violet-100/50 transition-all duration-300"
         >
+          {entry.data.cover_image && (
+            <div class="shrink-0">
+              <img
+                src={entry.data.cover_image}
+                alt={entry.data.title}
+                class="w-16 h-24 object-cover rounded-lg shadow-sm group-hover:shadow-md transition-shadow"
+                loading="lazy"
+              />
+            </div>
+          )}
           <div class="flex-1 min-w-0">
             <div class="flex items-center gap-2 mb-2 flex-wrap">
               <span class={`text-xs font-medium border px-2.5 py-1 rounded-full ${buzzColor(entry.data.buzz_level)}`}>

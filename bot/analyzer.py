@@ -89,9 +89,12 @@ def generate_markdown(manga: dict, analysis: dict, affiliate_tag: str) -> tuple[
     if not series_name:
         series_name = manga['title']
 
+    cover_image = manga.get("image_url", "")
+
     content = f"""---
 title: "{manga['title']}【新刊】期待値{analysis['expectation_score']}★ - あらすじ・見どころまとめ"
 series: "{series_name}"
+cover_image: "{cover_image}"
 description: "{analysis['pr_text_long']}"
 pubDate: "{today.strftime('%Y-%m-%d')}"
 genre: "{manga['genre']}"

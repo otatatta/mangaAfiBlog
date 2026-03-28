@@ -44,22 +44,36 @@ const seriesList = [...seriesMap.entries()]
       {seriesList.map(({ name, slug, latest, count }) => (
         <a
           href={`/series/${slug}`}
-          class="group bg-white border border-gray-200 rounded-2xl p-6 hover:border-violet-300 hover:shadow-lg hover:shadow-violet-100/50 transition-all duration-300"
+          class="group bg-white border border-gray-200 rounded-2xl p-5 hover:border-violet-300 hover:shadow-lg hover:shadow-violet-100/50 transition-all duration-300"
         >
-          <div class="flex items-center gap-2 mb-3">
-            <span class="text-xs font-medium bg-violet-100 text-violet-700 border border-violet-200 px-2.5 py-1 rounded-full">
-              {latest.data.genre}
-            </span>
-            <span class="text-xs text-gray-400 ml-auto">{count}件</span>
+          <div class="flex gap-4">
+            {latest.data.cover_image && (
+              <div class="shrink-0">
+                <img
+                  src={latest.data.cover_image}
+                  alt={name}
+                  class="w-20 h-28 object-cover rounded-lg shadow-sm group-hover:shadow-md transition-shadow"
+                  loading="lazy"
+                />
+              </div>
+            )}
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-xs font-medium bg-violet-100 text-violet-700 border border-violet-200 px-2.5 py-1 rounded-full">
+                  {latest.data.genre}
+                </span>
+                <span class="text-xs text-gray-400 ml-auto">{count}件</span>
+              </div>
+
+              <h2 class="text-lg font-bold text-gray-900 group-hover:text-violet-600 transition-colors mb-1">
+                {name}
+              </h2>
+
+              <p class="text-sm text-gray-400">
+                {latest.data.author_name} / {latest.data.publisher}
+              </p>
+            </div>
           </div>
-
-          <h2 class="text-lg font-bold text-gray-900 group-hover:text-violet-600 transition-colors mb-2">
-            {name}
-          </h2>
-
-          <p class="text-sm text-gray-400 mb-3">
-            {latest.data.author_name} / {latest.data.publisher}
-          </p>
 
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-1">
