@@ -18,16 +18,16 @@ const { title } = Astro.props;
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet" />
   </head>
-  <body class="bg-zinc-950 text-zinc-100 min-h-screen font-sans antialiased">
-    <header class="sticky top-0 z-50 backdrop-blur-xl bg-zinc-950/80 border-b border-zinc-800/50">
+  <body class="bg-gray-50 text-gray-900 min-h-screen font-sans antialiased">
+    <header class="sticky top-0 z-50 backdrop-blur-xl bg-white/80 border-b border-gray-200">
       <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
         <a href="/" class="group flex items-center gap-2">
           <span class="text-2xl">📚</span>
-          <span class="text-lg font-bold bg-gradient-to-r from-violet-400 to-pink-400 bg-clip-text text-transparent group-hover:from-violet-300 group-hover:to-pink-300 transition-all">
+          <span class="text-lg font-bold bg-gradient-to-r from-violet-600 to-pink-600 bg-clip-text text-transparent group-hover:from-violet-500 group-hover:to-pink-500 transition-all">
             漫画新刊まとめ
           </span>
         </a>
-        <nav class="text-sm text-zinc-400">
+        <nav class="text-sm text-gray-400">
           <span>毎週月曜更新</span>
         </nav>
       </div>
@@ -35,8 +35,8 @@ const { title } = Astro.props;
 
     <slot />
 
-    <footer class="border-t border-zinc-800/50 mt-20">
-      <div class="max-w-6xl mx-auto px-6 py-8 text-center text-zinc-500 text-sm space-y-1">
+    <footer class="border-t border-gray-200 mt-20">
+      <div class="max-w-6xl mx-auto px-6 py-8 text-center text-gray-400 text-sm space-y-1">
         <p>※ 当サイトはAmazonアソシエイトプログラムに参加しています。</p>
         <p>&copy; 2024 漫画新刊まとめ</p>
       </div>

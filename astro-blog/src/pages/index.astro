@@ -11,9 +11,9 @@ const genres = [...new Set(sorted.map((e) => e.data.genre))];
 
 const buzzColor = (level: string) => {
   switch (level) {
-    case "高": return "bg-rose-500/20 text-rose-300 border-rose-500/30";
-    case "中": return "bg-amber-500/20 text-amber-300 border-amber-500/30";
-    default:  return "bg-zinc-500/20 text-zinc-300 border-zinc-500/30";
+    case "高": return "bg-rose-100 text-rose-700 border-rose-200";
+    case "中": return "bg-amber-100 text-amber-700 border-amber-200";
+    default:  return "bg-gray-100 text-gray-600 border-gray-200";
   }
 };
 ---
@@ -22,10 +22,10 @@ const buzzColor = (level: string) => {
   <main class="max-w-6xl mx-auto px-6 py-12">
     <!-- Hero -->
     <section class="text-center mb-16">
-      <h1 class="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-violet-400 via-pink-400 to-orange-400 bg-clip-text text-transparent">
+      <h1 class="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-violet-600 via-pink-600 to-orange-500 bg-clip-text text-transparent">
         今週の新刊漫画まとめ
       </h1>
-      <p class="text-zinc-400 text-lg max-w-2xl mx-auto">
+      <p class="text-gray-500 text-lg max-w-2xl mx-auto">
         毎週月曜日に更新。新刊漫画の期待値・話題性をAIが独自分析してお届けします。
       </p>
     </section>
@@ -57,38 +57,36 @@ const buzzColor = (level: string) => {
           <a
             href={`/manga/${entry.slug}`}
             data-genre={entry.data.genre}
-            class="manga-card group relative bg-zinc-900 border border-zinc-800 rounded-2xl p-6 hover:border-violet-500/50 hover:bg-zinc-900/80 transition-all duration-300"
+            class="manga-card group relative bg-white border border-gray-200 rounded-2xl p-6 hover:border-violet-300 hover:shadow-lg hover:shadow-violet-100/50 transition-all duration-300"
           >
-            <div class="absolute inset-0 rounded-2xl bg-gradient-to-br from-violet-500/5 to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
             <div class="relative">
               <div class="flex items-center gap-2 mb-3 flex-wrap">
-                <span class="text-xs font-medium bg-violet-500/20 text-violet-300 border border-violet-500/30 px-2.5 py-1 rounded-full">
+                <span class="text-xs font-medium bg-violet-100 text-violet-700 border border-violet-200 px-2.5 py-1 rounded-full">
                   {entry.data.genre}
                 </span>
                 <span class={`text-xs font-medium border px-2.5 py-1 rounded-full ${buzzColor(entry.data.buzz_level)}`}>
                   話題性: {entry.data.buzz_level}
                 </span>
-                <span class="text-xs text-zinc-500 ml-auto">{entry.data.pubDate}</span>
+                <span class="text-xs text-gray-400 ml-auto">{entry.data.pubDate}</span>
               </div>
 
-              <h2 class="text-xl font-bold mb-2 group-hover:text-violet-300 transition-colors">
+              <h2 class="text-xl font-bold mb-2 text-gray-900 group-hover:text-violet-600 transition-colors">
                 {entry.data.title}
               </h2>
 
-              <p class="text-zinc-400 text-sm mb-4 line-clamp-2">
+              <p class="text-gray-500 text-sm mb-4 line-clamp-2">
                 {entry.data.description}
               </p>
 
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-1">
                   {[1,2,3,4,5].map((i) => (
-                    <span class={i <= entry.data.expectation_score ? "text-amber-400" : "text-zinc-700"}>
+                    <span class={i <= entry.data.expectation_score ? "text-amber-400" : "text-gray-200"}>
                       ★
                     </span>
                   ))}
                 </div>
-                <span class="text-xs text-zinc-500 group-hover:text-violet-400 transition-colors">
+                <span class="text-xs text-gray-400 group-hover:text-violet-500 transition-colors">
                   詳しく見る →
                 </span>
               </div>
@@ -99,25 +97,25 @@ const buzzColor = (level: string) => {
     ) : (
       <div class="text-center py-20">
         <div class="text-6xl mb-4">📖</div>
-        <p class="text-zinc-400 text-lg">まだ記事がありません</p>
-        <p class="text-zinc-500 text-sm mt-2">次回の月曜更新をお待ちください。</p>
+        <p class="text-gray-500 text-lg">まだ記事がありません</p>
+        <p class="text-gray-400 text-sm mt-2">次回の月曜更新をお待ちください。</p>
       </div>
     )}
 
     <style>
       .genre-btn {
-        border-color: rgb(63 63 70); /* zinc-700 */
-        color: rgb(161 161 170); /* zinc-400 */
-        background: transparent;
+        border-color: rgb(229 231 235); /* gray-200 */
+        color: rgb(107 114 128); /* gray-500 */
+        background: white;
       }
       .genre-btn:hover {
-        border-color: rgb(139 92 246 / 0.5); /* violet-500/50 */
-        color: rgb(196 181 253); /* violet-300 */
+        border-color: rgb(167 139 250); /* violet-400 */
+        color: rgb(109 40 217); /* violet-700 */
       }
       .genre-btn.active {
-        background: rgb(139 92 246 / 0.2);
-        border-color: rgb(139 92 246 / 0.5);
-        color: rgb(196 181 253);
+        background: rgb(237 233 254); /* violet-100 */
+        border-color: rgb(167 139 250); /* violet-400 */
+        color: rgb(109 40 217); /* violet-700 */
       }
       .manga-card.hidden-by-filter {
         display: none;
