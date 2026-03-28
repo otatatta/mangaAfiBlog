@@ -4,6 +4,7 @@ const mangaCollection = defineCollection({
   type: "content",
   schema: z.object({
     title: z.string(),
+    series: z.string(),
     description: z.string(),
     pubDate: z.string(),
     genre: z.string(),

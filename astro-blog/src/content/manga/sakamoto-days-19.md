@@ -1,5 +1,6 @@
 ---
 title: "SAKAMOTO DAYS 19巻"
+series: "SAKAMOTO DAYS"
 description: "元殺し屋・坂本太郎の戦いはさらに激化。ORDER編クライマックスに向けて怒涛の展開が続く注目作。"
 pubDate: "2026-03-04"
 genre: "少年漫画"

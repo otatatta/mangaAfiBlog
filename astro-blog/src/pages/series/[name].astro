@@ -1,0 +1,91 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+export async function getStaticPaths() {
+  const allManga = await getCollection("manga");
+  const seriesNames = [...new Set(allManga.map((e) => e.data.series))];
+
+  return seriesNames.map((name) => ({
+    params: { name: encodeURIComponent(name) },
+    props: {
+      seriesName: name,
+      entries: allManga
+        .filter((e) => e.data.series === name)
+        .sort((a, b) => new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime()),
+    },
+  }));
+}
+
+const { seriesName, entries } = Astro.props;
+const latest = entries[0];
+
+const buzzColor = (level: string) => {
+  switch (level) {
+    case "高": return "bg-rose-100 text-rose-700 border-rose-200";
+    case "中": return "bg-amber-100 text-amber-700 border-amber-200";
+    default:  return "bg-gray-100 text-gray-600 border-gray-200";
+  }
+};
+---
+
+<BaseLayout title={`${seriesName} | 漫画新刊まとめ`}>
+  <main class="max-w-4xl mx-auto px-6 py-12">
+    <a href="/series" class="inline-flex items-center gap-1 text-sm text-gray-400 hover:text-violet-600 transition-colors mb-8">
+      <span>←</span> シリーズ一覧に戻る
+    </a>
+
+    <!-- Series Header -->
+    <header class="mb-10 pb-8 border-b border-gray-200">
+      <h1 class="text-3xl md:text-4xl font-bold mb-3 bg-gradient-to-r from-violet-600 to-pink-600 bg-clip-text text-transparent">
+        {seriesName}
+      </h1>
+      <div class="flex items-center gap-4 text-sm text-gray-500">
+        <span>{latest.data.author_name}</span>
+        <span>{latest.data.publisher}</span>
+        <span>{latest.data.genre}</span>
+        <span class="ml-auto">{entries.length}件の記事</span>
+      </div>
+    </header>
+
+    <!-- Entries -->
+    <div class="space-y-4">
+      {entries.map((entry) => (
+        <a
+          href={`/manga/${entry.slug}`}
+          class="group flex items-center gap-5 bg-white border border-gray-200 rounded-2xl p-5 hover:border-violet-300 hover:shadow-lg hover:shadow-violet-100/50 transition-all duration-300"
+        >
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 mb-2 flex-wrap">
+              <span class={`text-xs font-medium border px-2.5 py-1 rounded-full ${buzzColor(entry.data.buzz_level)}`}>
+                話題性: {entry.data.buzz_level}
+              </span>
+              <span class="text-xs text-gray-400">{entry.data.pubDate}</span>
+            </div>
+
+            <h2 class="text-lg font-bold text-gray-900 group-hover:text-violet-600 transition-colors mb-1 truncate">
+              {entry.data.title}
+            </h2>
+
+            <p class="text-gray-500 text-sm line-clamp-1">
+              {entry.data.description}
+            </p>
+          </div>
+
+          <div class="flex flex-col items-end gap-2 shrink-0">
+            <div class="flex items-center gap-0.5">
+              {[1,2,3,4,5].map((i) => (
+                <span class={`text-sm ${i <= entry.data.expectation_score ? "text-amber-400" : "text-gray-200"}`}>
+                  ★
+                </span>
+              ))}
+            </div>
+            <span class="text-xs text-gray-400 group-hover:text-violet-500 transition-colors">
+              詳しく見る →
+            </span>
+          </div>
+        </a>
+      ))}
+    </div>
+  </main>
+</BaseLayout>

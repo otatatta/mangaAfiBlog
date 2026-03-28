@@ -84,8 +84,14 @@ def generate_markdown(manga: dict, analysis: dict, affiliate_tag: str) -> tuple[
     genre_tags_str = " ".join([f'"{t}"' for t in analysis["genre_tags"]])
     seo_keywords_str = " ".join([f'"{k}"' for k in analysis["seo_keywords"]])
 
+    # シリーズ名: タイトルから巻数部分を除去
+    series_name = re.sub(r'\s*\d+巻?\s*$', '', manga['title']).strip()
+    if not series_name:
+        series_name = manga['title']
+
     content = f"""---
 title: "{manga['title']}【新刊】期待値{analysis['expectation_score']}★ - あらすじ・見どころまとめ"
+series: "{series_name}"
 description: "{analysis['pr_text_long']}"
 pubDate: "{today.strftime('%Y-%m-%d')}"
 genre: "{manga['genre']}"

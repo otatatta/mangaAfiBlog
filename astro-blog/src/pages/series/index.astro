@@ -1,0 +1,80 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const allManga = await getCollection("manga");
+
+// シリーズごとにグループ化
+const seriesMap = new Map<string, typeof allManga>();
+for (const entry of allManga) {
+  const series = entry.data.series;
+  if (!seriesMap.has(series)) {
+    seriesMap.set(series, []);
+  }
+  seriesMap.get(series)!.push(entry);
+}
+
+// 各シリーズを最新pubDateでソート
+const seriesList = [...seriesMap.entries()]
+  .map(([name, entries]) => {
+    const sorted = entries.sort(
+      (a, b) => new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime()
+    );
+    return {
+      name,
+      slug: encodeURIComponent(name),
+      entries: sorted,
+      latest: sorted[0],
+      count: sorted.length,
+    };
+  })
+  .sort((a, b) => new Date(b.latest.data.pubDate).getTime() - new Date(a.latest.data.pubDate).getTime());
+---
+
+<BaseLayout title="シリーズ一覧 | 漫画新刊まとめ">
+  <main class="max-w-6xl mx-auto px-6 py-12">
+    <section class="text-center mb-16">
+      <h1 class="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-violet-600 via-pink-600 to-orange-500 bg-clip-text text-transparent">
+        シリーズ一覧
+      </h1>
+      <p class="text-gray-500 text-lg">タイトルごとにまとめて記事を閲覧できます</p>
+    </section>
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
+      {seriesList.map(({ name, slug, latest, count }) => (
+        <a
+          href={`/series/${slug}`}
+          class="group bg-white border border-gray-200 rounded-2xl p-6 hover:border-violet-300 hover:shadow-lg hover:shadow-violet-100/50 transition-all duration-300"
+        >
+          <div class="flex items-center gap-2 mb-3">
+            <span class="text-xs font-medium bg-violet-100 text-violet-700 border border-violet-200 px-2.5 py-1 rounded-full">
+              {latest.data.genre}
+            </span>
+            <span class="text-xs text-gray-400 ml-auto">{count}件</span>
+          </div>
+
+          <h2 class="text-lg font-bold text-gray-900 group-hover:text-violet-600 transition-colors mb-2">
+            {name}
+          </h2>
+
+          <p class="text-sm text-gray-400 mb-3">
+            {latest.data.author_name} / {latest.data.publisher}
+          </p>
+
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-1">
+              {[1,2,3,4,5].map((i) => (
+                <span class={i <= latest.data.expectation_score ? "text-amber-400 text-sm" : "text-gray-200 text-sm"}>
+                  ★
+                </span>
+              ))}
+            </div>
+            <span class="text-xs text-gray-400 group-hover:text-violet-500 transition-colors">
+              一覧を見る →
+            </span>
+          </div>
+        </a>
+      ))}
+    </div>
+  </main>
+</BaseLayout>
