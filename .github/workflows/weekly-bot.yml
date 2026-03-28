@@ -48,3 +48,38 @@ jobs:
             git commit -m "🤖 週次新刊記事を自動生成 $(date '+%Y-%m-%d')"
             git push
           fi
+
+  deploy:
+    needs: run-bot
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: リポジトリをチェックアウト
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Node.js セットアップ
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: 最新のコミットを取得
+        run: git pull origin ${{ github.ref_name }}
+
+      - name: 依存パッケージをインストール
+        run: |
+          cd astro-blog
+          npm install
+
+      - name: Astro ビルド
+        run: |
+          cd astro-blog
+          npm run build
+
+      - name: Cloudflare Pages にデプロイ
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy astro-blog/dist --project-name=manga-afi-blog
