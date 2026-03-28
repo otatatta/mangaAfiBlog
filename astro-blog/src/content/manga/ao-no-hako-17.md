@@ -1,7 +1,7 @@
 ---
 title: "アオのハコ 17巻"
 series: "アオのハコ"
-cover_image: "https://m.media-amazon.com/images/I/81dTWeDnURL._SY522_.jpg"
+cover_image: "https://books.google.com/books/content?id=Bq6bDwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
 description: "大喜と千夏の関係に新展開。インターハイを目前に控え、スポーツと恋の両立に揺れる青春ストーリー。"
 pubDate: "2026-03-04"
 genre: "ラブコメ"

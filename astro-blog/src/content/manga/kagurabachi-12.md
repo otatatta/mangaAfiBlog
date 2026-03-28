@@ -1,7 +1,7 @@
 ---
 title: "カグラバチ 12巻"
 series: "カグラバチ"
-cover_image: "https://m.media-amazon.com/images/I/81kPN+-FMOL._SY522_.jpg"
+cover_image: "https://books.google.com/books/content?id=0E0sEQAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
 description: "妖刀をめぐる壮絶な戦いが新章へ突入。チヒロの覚悟と新たな敵の登場で物語が加速する。"
 pubDate: "2026-03-04"
 genre: "少年漫画"
