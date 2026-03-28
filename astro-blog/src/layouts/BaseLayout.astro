@@ -14,22 +14,31 @@ const { title } = Astro.props;
     <meta name="description" content="今週の新刊漫画をまとめて紹介。期待値・話題性を独自分析。" />
     <title>{title}</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet" />
   </head>
-  <body class="bg-gray-50 text-gray-900 min-h-screen">
-    <header class="bg-white border-b">
-      <div class="max-w-4xl mx-auto px-4 py-4">
-        <a href="/" class="text-xl font-bold text-blue-600 hover:text-blue-700">
-          📚 漫画新刊まとめ
+  <body class="bg-zinc-950 text-zinc-100 min-h-screen font-sans antialiased">
+    <header class="sticky top-0 z-50 backdrop-blur-xl bg-zinc-950/80 border-b border-zinc-800/50">
+      <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+        <a href="/" class="group flex items-center gap-2">
+          <span class="text-2xl">📚</span>
+          <span class="text-lg font-bold bg-gradient-to-r from-violet-400 to-pink-400 bg-clip-text text-transparent group-hover:from-violet-300 group-hover:to-pink-300 transition-all">
+            漫画新刊まとめ
+          </span>
         </a>
+        <nav class="text-sm text-zinc-400">
+          <span>毎週月曜更新</span>
+        </nav>
       </div>
     </header>
 
     <slot />
 
-    <footer class="bg-white border-t mt-16">
-      <div class="max-w-4xl mx-auto px-4 py-6 text-center text-gray-500 text-sm">
+    <footer class="border-t border-zinc-800/50 mt-20">
+      <div class="max-w-6xl mx-auto px-6 py-8 text-center text-zinc-500 text-sm space-y-1">
         <p>※ 当サイトはAmazonアソシエイトプログラムに参加しています。</p>
-        <p class="mt-1">&copy; 2024 漫画新刊まとめ</p>
+        <p>&copy; 2024 漫画新刊まとめ</p>
       </div>
     </footer>
   </body>

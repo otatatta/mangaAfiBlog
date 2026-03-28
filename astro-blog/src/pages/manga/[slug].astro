@@ -12,25 +12,89 @@ export async function getStaticPaths() {
 
 const { entry } = Astro.props;
 const { Content } = await entry.render();
+
+const buzzColor = (level: string) => {
+  switch (level) {
+    case "高": return "bg-rose-500/20 text-rose-300 border-rose-500/30";
+    case "中": return "bg-amber-500/20 text-amber-300 border-amber-500/30";
+    default:  return "bg-zinc-500/20 text-zinc-300 border-zinc-500/30";
+  }
+};
 ---
 
-<BaseLayout title={entry.data.title}>
-  <main class="max-w-3xl mx-auto px-4 py-10">
-    <a href="/" class="text-blue-600 hover:underline text-sm mb-6 inline-block">
-      ← 一覧に戻る
+<BaseLayout title={`${entry.data.title} | 漫画新刊まとめ`}>
+  <main class="max-w-3xl mx-auto px-6 py-12">
+    <a href="/" class="inline-flex items-center gap-1 text-sm text-zinc-400 hover:text-violet-400 transition-colors mb-8">
+      <span>←</span> 一覧に戻る
     </a>
 
-    <article class="prose prose-lg max-w-none">
+    <!-- Header -->
+    <header class="mb-10">
+      <div class="flex items-center gap-2 mb-4 flex-wrap">
+        <span class="text-xs font-medium bg-violet-500/20 text-violet-300 border border-violet-500/30 px-2.5 py-1 rounded-full">
+          {entry.data.genre}
+        </span>
+        <span class={`text-xs font-medium border px-2.5 py-1 rounded-full ${buzzColor(entry.data.buzz_level)}`}>
+          話題性: {entry.data.buzz_level}
+        </span>
+      </div>
+
+      <h1 class="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-violet-400 to-pink-400 bg-clip-text text-transparent">
+        {entry.data.title}
+      </h1>
+
+      <p class="text-zinc-400 text-lg mb-6">{entry.data.description}</p>
+
+      <!-- Meta -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-center">
+          <div class="text-xs text-zinc-500 mb-1">著者</div>
+          <div class="text-sm font-medium">{entry.data.author_name}</div>
+        </div>
+        <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-center">
+          <div class="text-xs text-zinc-500 mb-1">出版社</div>
+          <div class="text-sm font-medium">{entry.data.publisher}</div>
+        </div>
+        <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-center">
+          <div class="text-xs text-zinc-500 mb-1">期待値</div>
+          <div class="text-amber-400">
+            {[1,2,3,4,5].map((i) => (
+              <span class={i <= entry.data.expectation_score ? "text-amber-400" : "text-zinc-700"}>★</span>
+            ))}
+          </div>
+        </div>
+        <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-center">
+          <div class="text-xs text-zinc-500 mb-1">発売日</div>
+          <div class="text-sm font-medium">{entry.data.pubDate}</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Tags -->
+    {entry.data.tags.length > 0 && (
+      <div class="flex flex-wrap gap-2 mb-8">
+        {entry.data.tags.map((tag: string) => (
+          <span class="text-xs bg-zinc-800 text-zinc-400 px-2.5 py-1 rounded-full">
+            #{tag}
+          </span>
+        ))}
+      </div>
+    )}
+
+    <!-- Content -->
+    <article class="prose prose-invert prose-lg max-w-none prose-headings:text-zinc-100 prose-p:text-zinc-300 prose-a:text-violet-400 prose-strong:text-zinc-100">
       <Content />
     </article>
 
-    <div class="mt-10 p-6 bg-blue-50 rounded-xl text-center">
-      <p class="text-lg font-semibold mb-4">この漫画をチェックする</p>
+    <!-- CTA -->
+    <div class="mt-12 p-8 bg-gradient-to-br from-violet-500/10 to-pink-500/10 border border-violet-500/20 rounded-2xl text-center">
+      <p class="text-lg font-bold mb-2">この漫画をチェックする</p>
+      <p class="text-sm text-zinc-400 mb-5">Amazonで詳細を確認できます</p>
       <a
         href={entry.data.affiliate_url}
         target="_blank"
         rel="noopener noreferrer"
-        class="inline-block bg-yellow-400 hover:bg-yellow-500 text-black font-bold px-6 py-3 rounded-lg transition"
+        class="inline-block bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-300 hover:to-orange-400 text-black font-bold px-8 py-3 rounded-xl transition-all duration-300 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/30"
       >
         Amazonで見る
       </a>
