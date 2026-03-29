@@ -1,0 +1,117 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const allManga = await getCollection("manga");
+const sorted = allManga.sort(
+  (a, b) => new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime()
+);
+---
+
+<BaseLayout title="お気に入り | 漫画新刊まとめ">
+  <main class="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+    <section class="text-center mb-10 sm:mb-16">
+      <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-violet-600 via-pink-600 to-orange-500 bg-clip-text text-transparent">
+        お気に入り・読書管理
+      </h1>
+      <p class="text-gray-500 dark:text-gray-400 text-base sm:text-lg">ブックマークした漫画と読書ステータスを管理</p>
+    </section>
+
+    <!-- Filter Tabs -->
+    <div class="flex gap-2 mb-8 flex-wrap" id="fav-filter">
+      <button data-filter="bookmark" class="fav-tab active text-sm font-medium px-4 py-2 rounded-full border transition-all">♥ お気に入り</button>
+      <button data-filter="want" class="fav-tab text-sm font-medium px-4 py-2 rounded-full border transition-all">📖 読みたい</button>
+      <button data-filter="reading" class="fav-tab text-sm font-medium px-4 py-2 rounded-full border transition-all">📕 読書中</button>
+      <button data-filter="done" class="fav-tab text-sm font-medium px-4 py-2 rounded-full border transition-all">✅ 読了</button>
+    </div>
+
+    <!-- Empty State -->
+    <div id="empty-state" class="text-center py-16">
+      <div class="text-5xl mb-4">♥</div>
+      <p class="text-gray-500 dark:text-gray-400 text-lg">まだ登録がありません</p>
+      <p class="text-gray-400 text-sm mt-2">漫画詳細ページからお気に入りや読書ステータスを設定できます</p>
+    </div>
+
+    <!-- Card List (populated by JS) -->
+    <div class="space-y-3" id="fav-list">
+      {sorted.map((entry) => (
+        <a
+          href={`/manga/${entry.slug}`}
+          data-slug={entry.slug}
+          class="fav-card hidden group flex gap-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 hover:border-violet-300 hover:shadow-md transition-all"
+        >
+          {entry.data.cover_image && (
+            <img src={entry.data.cover_image} alt={entry.data.title} class="w-12 h-16 object-cover rounded-lg shrink-0" loading="lazy" />
+          )}
+          <div class="flex-1 min-w-0">
+            <h3 class="font-bold text-gray-900 dark:text-gray-100 group-hover:text-violet-600 transition-colors truncate">{entry.data.title}</h3>
+            <p class="text-xs text-gray-400">{entry.data.author_name} | {entry.data.genre}</p>
+          </div>
+          <div class="shrink-0 flex items-center gap-0.5">
+            {[1,2,3,4,5].map((i) => (
+              <span class={`text-xs ${i <= entry.data.expectation_score ? "text-amber-400" : "text-gray-200"}`}>★</span>
+            ))}
+          </div>
+        </a>
+      ))}
+    </div>
+  </main>
+
+  <style>
+    .fav-tab {
+      border-color: rgb(229 231 235);
+      color: rgb(107 114 128);
+      background: white;
+    }
+    :global(.dark) .fav-tab {
+      border-color: rgb(75 85 99);
+      color: rgb(156 163 175);
+      background: rgb(31 41 55);
+    }
+    .fav-tab:hover { border-color: rgb(167 139 250); color: rgb(109 40 217); }
+    .fav-tab.active {
+      background: rgb(237 233 254);
+      border-color: rgb(167 139 250);
+      color: rgb(109 40 217);
+    }
+  </style>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const tabs = document.querySelectorAll<HTMLButtonElement>(".fav-tab");
+      const cards = document.querySelectorAll<HTMLAnchorElement>(".fav-card");
+      const emptyState = document.getElementById("empty-state");
+
+      let currentFilter = "bookmark";
+
+      function applyFilter() {
+        const bookmarks: Record<string, string> = JSON.parse(localStorage.getItem("manga-bookmarks") || "{}");
+        const statuses: Record<string, string> = JSON.parse(localStorage.getItem("manga-status") || "{}");
+
+        let visibleCount = 0;
+        cards.forEach((card) => {
+          const slug = card.dataset.slug!;
+          let show = false;
+          if (currentFilter === "bookmark" && bookmarks[slug]) show = true;
+          if (currentFilter !== "bookmark" && statuses[slug] === currentFilter) show = true;
+
+          card.classList.toggle("hidden", !show);
+          if (show) visibleCount++;
+        });
+
+        emptyState?.classList.toggle("hidden", visibleCount > 0);
+      }
+
+      tabs.forEach((tab) => {
+        tab.addEventListener("click", () => {
+          currentFilter = tab.dataset.filter!;
+          tabs.forEach((t) => t.classList.remove("active"));
+          tab.classList.add("active");
+          applyFilter();
+        });
+      });
+
+      applyFilter();
+    });
+  </script>
+</BaseLayout>

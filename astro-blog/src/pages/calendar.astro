@@ -44,7 +44,13 @@ const dayOfWeek = (dateStr: string) => {
       <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-violet-600 via-pink-600 to-orange-500 bg-clip-text text-transparent">
         新刊カレンダー
       </h1>
-      <p class="text-gray-500 text-base sm:text-lg">発売日順に新刊をチェック</p>
+      <p class="text-gray-500 dark:text-gray-400 text-base sm:text-lg">発売日順に新刊をチェック</p>
+      <button
+        id="ical-download"
+        class="mt-4 inline-flex items-center gap-2 text-sm font-medium bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-5 py-2.5 rounded-full hover:border-violet-300 hover:text-violet-600 transition-all"
+      >
+        📅 カレンダーに追加（.ics）
+      </button>
     </section>
 
     <div class="space-y-12">
@@ -114,4 +120,28 @@ const dayOfWeek = (dateStr: string) => {
       ))}
     </div>
   </main>
+
+  <script define:vars={{ icalData: allManga.map(e => ({ title: e.data.title, date: e.data.pubDate, author: e.data.author_name })) }}>
+    document.getElementById("ical-download")?.addEventListener("click", () => {
+      let ics = "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//漫画新刊まとめ//JP\r\nCALSCALE:GREGORIAN\r\n";
+      icalData.forEach((item) => {
+        const d = item.date.replace(/-/g, "");
+        ics += "BEGIN:VEVENT\r\n";
+        ics += `DTSTART;VALUE=DATE:${d}\r\n`;
+        ics += `DTEND;VALUE=DATE:${d}\r\n`;
+        ics += `SUMMARY:📚 ${item.title} 発売\r\n`;
+        ics += `DESCRIPTION:著者: ${item.author}\r\n`;
+        ics += "END:VEVENT\r\n";
+      });
+      ics += "END:VCALENDAR\r\n";
+
+      const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "manga-calendar.ics";
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+  </script>
 </BaseLayout>

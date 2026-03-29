@@ -16,6 +16,11 @@ const mangaCollection = defineCollection({
     tags: z.array(z.string()),
     seo_keywords: z.array(z.string()),
     affiliate_url: z.string(),
+    stores: z.array(z.object({
+      name: z.string(),
+      url: z.string(),
+      price: z.string().optional(),
+    })).optional().default([]),
   }),
 });
 

@@ -1,0 +1,83 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+export async function getStaticPaths() {
+  const allManga = await getCollection("manga");
+  const authorNames = [...new Set(allManga.map((e) => e.data.author_name))];
+
+  return authorNames.map((name) => ({
+    params: { name },
+    props: {
+      authorName: name,
+      entries: allManga
+        .filter((e) => e.data.author_name === name)
+        .sort((a, b) => new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime()),
+    },
+  }));
+}
+
+const { authorName, entries } = Astro.props;
+
+const buzzLabel = (level: string) => {
+  switch (level) {
+    case "高": return { color: "bg-rose-100 text-rose-700 border-rose-200", icon: "🔥", text: "話題沸騰" };
+    case "中": return { color: "bg-amber-100 text-amber-700 border-amber-200", icon: "📈", text: "注目" };
+    default:  return { color: "bg-gray-100 text-gray-600 border-gray-200", icon: "📖", text: "チェック" };
+  }
+};
+---
+
+<BaseLayout title={`${authorName} の作品 | 漫画新刊まとめ`}>
+  <main class="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+    <a href="/authors" class="inline-flex items-center gap-1 text-sm text-gray-400 hover:text-violet-600 transition-colors mb-8">
+      <span>←</span> 著者一覧に戻る
+    </a>
+
+    <header class="mb-10 pb-8 border-b border-gray-200">
+      <div class="flex items-center gap-4">
+        <div class="w-14 h-14 bg-gradient-to-br from-violet-100 to-pink-100 rounded-full flex items-center justify-center text-violet-600 font-bold text-xl shrink-0">
+          {authorName.charAt(0)}
+        </div>
+        <div>
+          <h1 class="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-violet-600 to-pink-600 bg-clip-text text-transparent">
+            {authorName}
+          </h1>
+          <p class="text-gray-500 text-sm">{entries.length}件の作品</p>
+        </div>
+      </div>
+    </header>
+
+    <div class="space-y-4">
+      {entries.map((entry) => {
+        const buzz = buzzLabel(entry.data.buzz_level);
+        return (
+          <a
+            href={`/manga/${entry.slug}`}
+            class="group flex gap-4 sm:gap-5 bg-white border border-gray-200 rounded-xl sm:rounded-2xl p-4 sm:p-5 hover:border-violet-300 hover:shadow-lg hover:shadow-violet-100/50 transition-all duration-300"
+          >
+            {entry.data.cover_image && (
+              <div class="shrink-0">
+                <img src={entry.data.cover_image} alt={entry.data.title} class="w-16 h-24 object-cover rounded-lg shadow-sm group-hover:shadow-md transition-shadow" loading="lazy" />
+              </div>
+            )}
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-1.5 flex-wrap">
+                <span class="text-xs font-medium bg-violet-100 text-violet-700 border border-violet-200 px-2.5 py-1 rounded-full">{entry.data.genre}</span>
+                <span class={`text-xs font-medium border px-2.5 py-1 rounded-full ${buzz.color}`}>{buzz.icon} {buzz.text}</span>
+                <span class="text-xs text-gray-400">{entry.data.pubDate}</span>
+              </div>
+              <h2 class="text-lg font-bold text-gray-900 group-hover:text-violet-600 transition-colors truncate">{entry.data.title}</h2>
+              <p class="text-gray-500 text-sm line-clamp-1 mt-1">{entry.data.description}</p>
+            </div>
+            <div class="shrink-0 flex items-center gap-0.5 max-sm:hidden">
+              {[1,2,3,4,5].map((i) => (
+                <span class={`text-sm ${i <= entry.data.expectation_score ? "text-amber-400" : "text-gray-200"}`}>★</span>
+              ))}
+            </div>
+          </a>
+        );
+      })}
+    </div>
+  </main>
+</BaseLayout>

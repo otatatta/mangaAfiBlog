@@ -1,0 +1,50 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const allManga = await getCollection("manga");
+
+const pubMap = new Map<string, typeof allManga>();
+for (const entry of allManga) {
+  const pub = entry.data.publisher;
+  if (!pubMap.has(pub)) pubMap.set(pub, []);
+  pubMap.get(pub)!.push(entry);
+}
+
+const publishers = [...pubMap.entries()]
+  .map(([name, entries]) => ({
+    name,
+    entries: entries.sort((a, b) => new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime()),
+    count: entries.length,
+    genres: [...new Set(entries.map((e) => e.data.genre))],
+  }))
+  .sort((a, b) => b.count - a.count);
+---
+
+<BaseLayout title="出版社一覧 | 漫画新刊まとめ">
+  <main class="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+    <section class="text-center mb-10 sm:mb-16">
+      <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-violet-600 via-pink-600 to-orange-500 bg-clip-text text-transparent">
+        出版社一覧
+      </h1>
+      <p class="text-gray-500 text-base sm:text-lg">出版社から漫画を探す</p>
+    </section>
+
+    <div class="grid sm:grid-cols-2 gap-4">
+      {publishers.map(({ name, count, genres }) => (
+        <a
+          href={`/publishers/${encodeURIComponent(name)}`}
+          class="group bg-white border border-gray-200 rounded-xl p-5 hover:border-violet-300 hover:shadow-lg hover:shadow-violet-100/50 transition-all duration-300"
+        >
+          <h2 class="text-lg font-bold text-gray-900 group-hover:text-violet-600 transition-colors mb-2">{name}</h2>
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="text-sm text-gray-500">{count}件</span>
+            {genres.map((g) => (
+              <span class="text-xs bg-violet-50 text-violet-600 px-2 py-0.5 rounded">{g}</span>
+            ))}
+          </div>
+        </a>
+      ))}
+    </div>
+  </main>
+</BaseLayout>
