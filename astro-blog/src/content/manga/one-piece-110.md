@@ -4,12 +4,12 @@ series: "ONE PIECE"
 cover_image: "https://books.google.com/books/content?id=c3glEQAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
 description: "エルバフ編が本格始動！麦わらの一味がたどり着いた巨人の国で新たな冒険が幕を開ける。ロキの真意とは？"
 pubDate: "2026-03-04"
-genre: "少年漫画"
+genre: "ファンタジー"
 author_name: "尾田栄一郎"
 publisher: "集英社"
 expectation_score: 5
 buzz_level: "高"
-tags: ["ワンピース", "エルバフ", "ジャンプ", "冒険"]
+tags: ["ワンピース", "エルバフ", "ジャンプ", "冒険", "ファンタジー", "海賊"]
 seo_keywords: ["ONE PIECE 110巻", "ワンピース最新刊", "エルバフ編"]
 affiliate_url: "https://www.amazon.co.jp/dp/example1?tag=example-22"
 ---

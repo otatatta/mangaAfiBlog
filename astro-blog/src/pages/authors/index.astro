@@ -1,0 +1,53 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+const allManga = await getCollection("manga");
+
+const authorMap = new Map<string, typeof allManga>();
+for (const entry of allManga) {
+  const author = entry.data.author_name;
+  if (!authorMap.has(author)) authorMap.set(author, []);
+  authorMap.get(author)!.push(entry);
+}
+
+const authors = [...authorMap.entries()]
+  .map(([name, entries]) => ({
+    name,
+    entries: entries.sort((a, b) => new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime()),
+    count: entries.length,
+  }))
+  .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name, "ja"));
+---
+
+<BaseLayout title="著者一覧 | 漫画新刊まとめ">
+  <main class="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+    <section class="text-center mb-10 sm:mb-16">
+      <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-violet-600 via-pink-600 to-orange-500 bg-clip-text text-transparent">
+        著者一覧
+      </h1>
+      <p class="text-gray-500 text-base sm:text-lg">著者から漫画を探す</p>
+    </section>
+
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {authors.map(({ name, entries, count }) => (
+        <a
+          href={`/authors/${encodeURIComponent(name)}`}
+          class="group bg-white border border-gray-200 rounded-xl p-4 hover:border-violet-300 hover:shadow-lg hover:shadow-violet-100/50 transition-all duration-300"
+        >
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-gradient-to-br from-violet-100 to-pink-100 rounded-full flex items-center justify-center text-violet-600 font-bold text-sm shrink-0">
+              {name.charAt(0)}
+            </div>
+            <div class="flex-1 min-w-0">
+              <h2 class="font-bold text-gray-900 group-hover:text-violet-600 transition-colors truncate">
+                {name}
+              </h2>
+              <p class="text-xs text-gray-400">{count}件 | {entries[0].data.genre}</p>
+            </div>
+          </div>
+        </a>
+      ))}
+    </div>
+  </main>
+</BaseLayout>

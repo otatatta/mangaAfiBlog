@@ -4,7 +4,7 @@ series: "SAKAMOTO DAYS"
 cover_image: "https://books.google.com/books/content?id=a3glEQAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
 description: "元殺し屋・坂本太郎の戦いはさらに激化。ORDER編クライマックスに向けて怒涛の展開が続く注目作。"
 pubDate: "2026-03-04"
-genre: "少年漫画"
+genre: "アクション"
 author_name: "鈴木祐斗"
 publisher: "集英社"
 expectation_score: 5

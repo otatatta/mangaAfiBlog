@@ -22,7 +22,7 @@ const seriesList = [...seriesMap.entries()]
     );
     return {
       name,
-      slug: name.toLowerCase().replace(/\s+/g, "-"),
+      slug: name.toLowerCase().replace(/[:\s]+/g, "-").replace(/[^a-z0-9\u3000-\u9fff\u30a0-\u30ff\u3040-\u309f-]/g, ""),
       entries: sorted,
       latest: sorted[0],
       count: sorted.length,

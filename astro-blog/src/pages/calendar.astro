@@ -1,0 +1,147 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const allManga = await getCollection("manga");
+
+// 月ごとにグループ化
+const monthMap = new Map<string, typeof allManga>();
+for (const entry of allManga) {
+  const date = new Date(entry.data.pubDate);
+  const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+  if (!monthMap.has(key)) monthMap.set(key, []);
+  monthMap.get(key)!.push(entry);
+}
+
+// 月を新しい順にソート
+const months = [...monthMap.entries()]
+  .sort((a, b) => b[0].localeCompare(a[0]))
+  .map(([key, entries]) => ({
+    key,
+    label: `${key.split("-")[0]}年${parseInt(key.split("-")[1])}月`,
+    entries: entries.sort(
+      (a, b) => new Date(a.data.pubDate).getTime() - new Date(b.data.pubDate).getTime()
+    ),
+  }));
+
+const buzzLabel = (level: string) => {
+  switch (level) {
+    case "高": return { color: "bg-rose-100 text-rose-700 border-rose-200", icon: "🔥" };
+    case "中": return { color: "bg-amber-100 text-amber-700 border-amber-200", icon: "📈" };
+    default:  return { color: "bg-gray-100 text-gray-600 border-gray-200", icon: "📖" };
+  }
+};
+
+const dayOfWeek = (dateStr: string) => {
+  const days = ["日", "月", "火", "水", "木", "金", "土"];
+  return days[new Date(dateStr).getDay()];
+};
+---
+
+<BaseLayout title="新刊カレンダー | 漫画新刊まとめ">
+  <main class="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+    <section class="text-center mb-10 sm:mb-16">
+      <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-violet-600 via-pink-600 to-orange-500 bg-clip-text text-transparent">
+        新刊カレンダー
+      </h1>
+      <p class="text-gray-500 dark:text-gray-400 text-base sm:text-lg">発売日順に新刊をチェック</p>
+      <button
+        id="ical-download"
+        class="mt-4 inline-flex items-center gap-2 text-sm font-medium bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 px-5 py-2.5 rounded-full hover:border-violet-300 hover:text-violet-600 transition-all"
+      >
+        📅 カレンダーに追加（.ics）
+      </button>
+    </section>
+
+    <div class="space-y-12">
+      {months.map(({ key, label, entries }) => (
+        <section>
+          <h2 class="text-xl sm:text-2xl font-bold text-gray-900 mb-6 pb-3 border-b-2 border-violet-200">
+            {label}
+          </h2>
+
+          <div class="space-y-3">
+            {entries.map((entry) => {
+              const date = new Date(entry.data.pubDate);
+              const day = date.getDate();
+              const dow = dayOfWeek(entry.data.pubDate);
+              const buzz = buzzLabel(entry.data.buzz_level);
+              return (
+                <a
+                  href={`/manga/${entry.slug}`}
+                  class="group flex items-center gap-3 sm:gap-5 bg-white border border-gray-200 rounded-xl p-3 sm:p-4 hover:border-violet-300 hover:shadow-md hover:shadow-violet-100/50 transition-all duration-200"
+                >
+                  {/* Date */}
+                  <div class="shrink-0 w-14 sm:w-16 text-center">
+                    <div class="text-2xl sm:text-3xl font-bold text-violet-600">{day}</div>
+                    <div class="text-xs text-gray-400">{dow}曜日</div>
+                  </div>
+
+                  <div class="w-px h-12 bg-gray-200 shrink-0"></div>
+
+                  {entry.data.cover_image && (
+                    <div class="shrink-0 max-sm:hidden">
+                      <img
+                        src={entry.data.cover_image}
+                        alt={entry.data.title}
+                        class="w-12 h-16 object-cover rounded-lg shadow-sm"
+                        loading="lazy"
+                      />
+                    </div>
+                  )}
+
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 mb-1 flex-wrap">
+                      <span class="text-xs font-medium bg-violet-100 text-violet-700 border border-violet-200 px-2 py-0.5 rounded-full">
+                        {entry.data.genre}
+                      </span>
+                      <span class={`text-xs font-medium border px-2 py-0.5 rounded-full ${buzz.color}`}>
+                        {buzz.icon}
+                      </span>
+                    </div>
+                    <h3 class="font-bold text-gray-900 group-hover:text-violet-600 transition-colors truncate">
+                      {entry.data.title}
+                    </h3>
+                    <p class="text-xs text-gray-400 mt-0.5">{entry.data.author_name} / {entry.data.publisher}</p>
+                  </div>
+
+                  <div class="shrink-0 flex items-center gap-0.5 max-sm:hidden">
+                    {[1,2,3,4,5].map((i) => (
+                      <span class={`text-xs ${i <= entry.data.expectation_score ? "text-amber-400" : "text-gray-200"}`}>
+                        ★
+                      </span>
+                    ))}
+                  </div>
+                </a>
+              );
+            })}
+          </div>
+        </section>
+      ))}
+    </div>
+  </main>
+
+  <script define:vars={{ icalData: allManga.map(e => ({ title: e.data.title, date: e.data.pubDate, author: e.data.author_name })) }}>
+    document.getElementById("ical-download")?.addEventListener("click", () => {
+      let ics = "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//漫画新刊まとめ//JP\r\nCALSCALE:GREGORIAN\r\n";
+      icalData.forEach((item) => {
+        const d = item.date.replace(/-/g, "");
+        ics += "BEGIN:VEVENT\r\n";
+        ics += `DTSTART;VALUE=DATE:${d}\r\n`;
+        ics += `DTEND;VALUE=DATE:${d}\r\n`;
+        ics += `SUMMARY:📚 ${item.title} 発売\r\n`;
+        ics += `DESCRIPTION:著者: ${item.author}\r\n`;
+        ics += "END:VEVENT\r\n";
+      });
+      ics += "END:VCALENDAR\r\n";
+
+      const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "manga-calendar.ics";
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+  </script>
+</BaseLayout>

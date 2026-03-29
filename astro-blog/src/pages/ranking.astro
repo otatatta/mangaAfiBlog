@@ -1,0 +1,112 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const allManga = await getCollection("manga");
+
+// スコア算出: 期待度(1-5) + バズレベル(高=3,中=2,低=1)
+const buzzScore = (level: string) => {
+  switch (level) {
+    case "高": return 3;
+    case "中": return 2;
+    default: return 1;
+  }
+};
+
+const ranked = allManga
+  .map((entry) => ({
+    entry,
+    totalScore: entry.data.expectation_score + buzzScore(entry.data.buzz_level),
+  }))
+  .sort((a, b) => b.totalScore - a.totalScore || new Date(b.entry.data.pubDate).getTime() - new Date(a.entry.data.pubDate).getTime());
+
+const buzzLabel = (level: string) => {
+  switch (level) {
+    case "高": return { color: "bg-rose-100 text-rose-700 border-rose-200", icon: "🔥", text: "話題沸騰" };
+    case "中": return { color: "bg-amber-100 text-amber-700 border-amber-200", icon: "📈", text: "注目" };
+    default:  return { color: "bg-gray-100 text-gray-600 border-gray-200", icon: "📖", text: "チェック" };
+  }
+};
+
+const rankBadge = (rank: number) => {
+  switch (rank) {
+    case 1: return { bg: "bg-amber-400", text: "text-white", label: "1" };
+    case 2: return { bg: "bg-gray-300", text: "text-white", label: "2" };
+    case 3: return { bg: "bg-orange-300", text: "text-white", label: "3" };
+    default: return { bg: "bg-gray-100", text: "text-gray-500", label: String(rank) };
+  }
+};
+---
+
+<BaseLayout title="おすすめランキング | 漫画新刊まとめ">
+  <main class="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+    <section class="text-center mb-10 sm:mb-16">
+      <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-violet-600 via-pink-600 to-orange-500 bg-clip-text text-transparent">
+        おすすめランキング
+      </h1>
+      <p class="text-gray-500 text-base sm:text-lg">期待度と話題性を総合評価したランキング</p>
+    </section>
+
+    <div class="space-y-4">
+      {ranked.map(({ entry, totalScore }, index) => {
+        const rank = index + 1;
+        const badge = rankBadge(rank);
+        const buzz = buzzLabel(entry.data.buzz_level);
+        return (
+          <a
+            href={`/manga/${entry.slug}`}
+            class="group flex items-center gap-3 sm:gap-5 bg-white border border-gray-200 rounded-xl sm:rounded-2xl p-3 sm:p-5 hover:border-violet-300 hover:shadow-lg hover:shadow-violet-100/50 transition-all duration-300"
+          >
+            {/* Rank Badge */}
+            <div class={`shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-full ${badge.bg} ${badge.text} flex items-center justify-center font-bold text-lg sm:text-xl`}>
+              {badge.label}
+            </div>
+
+            {entry.data.cover_image && (
+              <div class="shrink-0 max-sm:hidden">
+                <img
+                  src={entry.data.cover_image}
+                  alt={entry.data.title}
+                  class="w-16 h-24 object-cover rounded-lg shadow-sm group-hover:shadow-md transition-shadow"
+                  loading="lazy"
+                />
+              </div>
+            )}
+
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-1.5 flex-wrap">
+                <span class="text-xs font-medium bg-violet-100 text-violet-700 border border-violet-200 px-2.5 py-1 rounded-full">
+                  {entry.data.genre}
+                </span>
+                <span class={`text-xs font-medium border px-2.5 py-1 rounded-full ${buzz.color}`}>
+                  {buzz.icon} {buzz.text}
+                </span>
+              </div>
+
+              <h2 class="text-base sm:text-lg font-bold text-gray-900 group-hover:text-violet-600 transition-colors truncate">
+                {entry.data.title}
+              </h2>
+
+              <p class="text-gray-500 text-sm line-clamp-1 mt-1">
+                {entry.data.description}
+              </p>
+            </div>
+
+            <div class="shrink-0 text-right max-sm:hidden">
+              <div class="flex items-center gap-0.5 mb-1">
+                {[1,2,3,4,5].map((i) => (
+                  <span class={`text-sm ${i <= entry.data.expectation_score ? "text-amber-400" : "text-gray-200"}`}>
+                    ★
+                  </span>
+                ))}
+              </div>
+              <div class="text-xs text-gray-400">
+                総合スコア: {totalScore}/8
+              </div>
+            </div>
+          </a>
+        );
+      })}
+    </div>
+  </main>
+</BaseLayout>

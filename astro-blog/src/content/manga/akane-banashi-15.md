@@ -4,7 +4,7 @@ series: "あかね噺"
 cover_image: "https://books.google.com/books/content?id=Yte9EQAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
 description: "落語の世界で頂点を目指すあかねの挑戦。真打昇進試験編がいよいよ佳境を迎える。"
 pubDate: "2026-03-18"
-genre: "少年漫画"
+genre: "文化系"
 author_name: "末永裕樹・馬上鷹将"
 publisher: "集英社"
 expectation_score: 4
