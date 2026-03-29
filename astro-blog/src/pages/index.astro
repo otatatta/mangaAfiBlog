@@ -9,30 +9,53 @@ const sorted = allManga.sort(
 
 const genres = [...new Set(sorted.map((e) => e.data.genre))];
 
-const buzzColor = (level: string) => {
+const buzzLabel = (level: string) => {
   switch (level) {
-    case "高": return "bg-rose-100 text-rose-700 border-rose-200";
-    case "中": return "bg-amber-100 text-amber-700 border-amber-200";
-    default:  return "bg-gray-100 text-gray-600 border-gray-200";
+    case "高": return { color: "bg-rose-100 text-rose-700 border-rose-200", icon: "🔥", text: "話題沸騰" };
+    case "中": return { color: "bg-amber-100 text-amber-700 border-amber-200", icon: "📈", text: "注目" };
+    default:  return { color: "bg-gray-100 text-gray-600 border-gray-200", icon: "📖", text: "チェック" };
   }
 };
 ---
 
 <BaseLayout title="今週の新刊漫画まとめ | 漫画新刊まとめ">
-  <main class="max-w-6xl mx-auto px-6 py-12">
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
     <!-- Hero -->
-    <section class="text-center mb-16">
-      <h1 class="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-violet-600 via-pink-600 to-orange-500 bg-clip-text text-transparent">
+    <section class="text-center mb-10 sm:mb-16">
+      <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-violet-600 via-pink-600 to-orange-500 bg-clip-text text-transparent">
         今週の新刊漫画まとめ
       </h1>
-      <p class="text-gray-500 text-lg max-w-2xl mx-auto">
+      <p class="text-gray-500 text-base sm:text-lg max-w-2xl mx-auto">
         毎週月曜日に更新。新刊漫画の期待値・話題性をAIが独自分析してお届けします。
       </p>
     </section>
 
+    <!-- Search & Sort -->
+    <div class="flex flex-col sm:flex-row gap-3 mb-6">
+      <div class="relative flex-1">
+        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none">🔍</span>
+        <input
+          type="text"
+          id="search-input"
+          placeholder="タイトル・著者・タグで検索..."
+          class="w-full pl-9 pr-4 py-2.5 text-sm border border-gray-200 rounded-xl bg-white focus:outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-100 transition-all"
+        />
+      </div>
+      <select
+        id="sort-select"
+        class="px-4 py-2.5 text-sm border border-gray-200 rounded-xl bg-white focus:outline-none focus:border-violet-400 focus:ring-2 focus:ring-violet-100 transition-all cursor-pointer"
+      >
+        <option value="date-desc">発売日: 新しい順</option>
+        <option value="date-asc">発売日: 古い順</option>
+        <option value="score-desc">期待度: 高い順</option>
+        <option value="score-asc">期待度: 低い順</option>
+        <option value="title-asc">タイトル: あ→わ</option>
+      </select>
+    </div>
+
     <!-- Genre Filter -->
     {genres.length > 1 && (
-      <div class="flex items-center gap-3 mb-8 flex-wrap" id="genre-filter">
+      <div class="flex items-center gap-2 sm:gap-3 mb-8 flex-wrap" id="genre-filter">
         <button
           data-genre="all"
           class="genre-btn active text-sm font-medium px-4 py-2 rounded-full border transition-all duration-200"
@@ -50,6 +73,13 @@ const buzzColor = (level: string) => {
       </div>
     )}
 
+    <!-- No Results -->
+    <div id="no-results" class="hidden text-center py-16">
+      <div class="text-5xl mb-4">🔍</div>
+      <p class="text-gray-500 text-lg">該当する漫画が見つかりません</p>
+      <p class="text-gray-400 text-sm mt-2">検索キーワードやフィルターを変更してみてください</p>
+    </div>
+
     <!-- Manga Grid -->
     {sorted.length > 0 ? (
       <div class="grid md:grid-cols-2 gap-5" id="manga-grid">
@@ -57,14 +87,19 @@ const buzzColor = (level: string) => {
           <a
             href={`/manga/${entry.slug}`}
             data-genre={entry.data.genre}
-            class="manga-card group flex gap-5 bg-white border border-gray-200 rounded-2xl p-5 hover:border-violet-300 hover:shadow-lg hover:shadow-violet-100/50 transition-all duration-300"
+            data-title={entry.data.title}
+            data-author={entry.data.author_name}
+            data-tags={entry.data.tags.join(",")}
+            data-date={entry.data.pubDate}
+            data-score={entry.data.expectation_score}
+            class="manga-card group flex gap-3 sm:gap-5 bg-white border border-gray-200 rounded-xl sm:rounded-2xl p-3 sm:p-5 hover:border-violet-300 hover:shadow-lg hover:shadow-violet-100/50 transition-all duration-300"
           >
             {entry.data.cover_image && (
               <div class="shrink-0">
                 <img
                   src={entry.data.cover_image}
                   alt={entry.data.title}
-                  class="w-24 h-36 object-cover rounded-lg shadow-sm group-hover:shadow-md transition-shadow"
+                  class="w-20 sm:w-24 h-28 sm:h-36 object-cover rounded-lg shadow-sm group-hover:shadow-md transition-shadow"
                   loading="lazy"
                 />
               </div>
@@ -74,10 +109,10 @@ const buzzColor = (level: string) => {
                 <span class="text-xs font-medium bg-violet-100 text-violet-700 border border-violet-200 px-2.5 py-1 rounded-full">
                   {entry.data.genre}
                 </span>
-                <span class={`text-xs font-medium border px-2.5 py-1 rounded-full ${buzzColor(entry.data.buzz_level)}`}>
-                  話題性: {entry.data.buzz_level}
+                <span class={`text-xs font-medium border px-2.5 py-1 rounded-full ${buzzLabel(entry.data.buzz_level).color}`}>
+                  {buzzLabel(entry.data.buzz_level).icon} {buzzLabel(entry.data.buzz_level).text}
                 </span>
-                <span class="text-xs text-gray-400 ml-auto">{entry.data.pubDate}</span>
+                <span class="text-xs text-gray-400 ml-auto max-sm:hidden">{entry.data.pubDate}</span>
               </div>
 
               <h2 class="text-lg font-bold mb-1 text-gray-900 group-hover:text-violet-600 transition-colors">
@@ -89,12 +124,17 @@ const buzzColor = (level: string) => {
               </p>
 
               <div class="flex items-center justify-between">
-                <div class="flex items-center gap-1">
-                  {[1,2,3,4,5].map((i) => (
-                    <span class={i <= entry.data.expectation_score ? "text-amber-400" : "text-gray-200"}>
-                      ★
-                    </span>
-                  ))}
+                <div class="flex items-center gap-1.5">
+                  <div class="flex items-center">
+                    {[1,2,3,4,5].map((i) => (
+                      <span class={`text-sm ${i <= entry.data.expectation_score ? "text-amber-400" : "text-gray-200"}`}>
+                        ★
+                      </span>
+                    ))}
+                  </div>
+                  <span class="text-xs text-gray-400">
+                    {entry.data.expectation_score}/5
+                  </span>
                 </div>
                 <span class="text-xs text-gray-400 group-hover:text-violet-500 transition-colors">
                   詳しく見る →
@@ -104,6 +144,8 @@ const buzzColor = (level: string) => {
           </a>
         ))}
       </div>
+      <!-- Pagination -->
+      <nav id="pagination" class="flex items-center justify-center gap-2 mt-10"></nav>
     ) : (
       <div class="text-center py-20">
         <div class="text-6xl mb-4">📖</div>
@@ -114,45 +156,184 @@ const buzzColor = (level: string) => {
 
     <style>
       .genre-btn {
-        border-color: rgb(229 231 235); /* gray-200 */
-        color: rgb(107 114 128); /* gray-500 */
+        border-color: rgb(229 231 235);
+        color: rgb(107 114 128);
         background: white;
       }
       .genre-btn:hover {
-        border-color: rgb(167 139 250); /* violet-400 */
-        color: rgb(109 40 217); /* violet-700 */
+        border-color: rgb(167 139 250);
+        color: rgb(109 40 217);
       }
       .genre-btn.active {
-        background: rgb(237 233 254); /* violet-100 */
-        border-color: rgb(167 139 250); /* violet-400 */
-        color: rgb(109 40 217); /* violet-700 */
+        background: rgb(237 233 254);
+        border-color: rgb(167 139 250);
+        color: rgb(109 40 217);
       }
       .manga-card.hidden-by-filter {
         display: none;
+      }
+      .page-btn {
+        min-width: 2.5rem;
+        height: 2.5rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        border: 1px solid rgb(229 231 235);
+        color: rgb(107 114 128);
+        background: white;
+        transition: all 0.2s;
+        cursor: pointer;
+      }
+      .page-btn:hover:not(:disabled) {
+        border-color: rgb(167 139 250);
+        color: rgb(109 40 217);
+      }
+      .page-btn.active {
+        background: rgb(237 233 254);
+        border-color: rgb(167 139 250);
+        color: rgb(109 40 217);
+      }
+      .page-btn:disabled {
+        opacity: 0.4;
+        cursor: default;
       }
     </style>
 
     <script>
       document.addEventListener("DOMContentLoaded", () => {
-        const buttons = document.querySelectorAll<HTMLButtonElement>(".genre-btn");
-        const cards = document.querySelectorAll<HTMLAnchorElement>(".manga-card");
+        const ITEMS_PER_PAGE = 6;
+        const genreButtons = document.querySelectorAll<HTMLButtonElement>(".genre-btn");
+        const grid = document.getElementById("manga-grid");
+        const cards = [...document.querySelectorAll<HTMLAnchorElement>(".manga-card")];
+        const pagination = document.getElementById("pagination");
+        const searchInput = document.getElementById("search-input") as HTMLInputElement;
+        const sortSelect = document.getElementById("sort-select") as HTMLSelectElement;
+        const noResults = document.getElementById("no-results");
 
-        buttons.forEach((btn) => {
-          btn.addEventListener("click", () => {
-            const genre = btn.dataset.genre;
+        let currentGenre = "all";
+        let currentPage = 1;
+        let searchQuery = "";
+        let sortMode = "date-desc";
 
-            buttons.forEach((b) => b.classList.remove("active"));
-            btn.classList.add("active");
+        function matchesSearch(card: HTMLAnchorElement): boolean {
+          if (!searchQuery) return true;
+          const q = searchQuery.toLowerCase();
+          const title = (card.dataset.title || "").toLowerCase();
+          const author = (card.dataset.author || "").toLowerCase();
+          const tags = (card.dataset.tags || "").toLowerCase();
+          return title.includes(q) || author.includes(q) || tags.includes(q);
+        }
 
-            cards.forEach((card) => {
-              if (genre === "all" || card.dataset.genre === genre) {
-                card.classList.remove("hidden-by-filter");
-              } else {
-                card.classList.add("hidden-by-filter");
-              }
+        function getFilteredCards(): HTMLAnchorElement[] {
+          return cards.filter(
+            (card) =>
+              (currentGenre === "all" || card.dataset.genre === currentGenre) &&
+              matchesSearch(card)
+          );
+        }
+
+        function sortCards(filtered: HTMLAnchorElement[]): HTMLAnchorElement[] {
+          return [...filtered].sort((a, b) => {
+            switch (sortMode) {
+              case "date-asc":
+                return (a.dataset.date || "").localeCompare(b.dataset.date || "");
+              case "score-desc":
+                return parseInt(b.dataset.score || "0") - parseInt(a.dataset.score || "0");
+              case "score-asc":
+                return parseInt(a.dataset.score || "0") - parseInt(b.dataset.score || "0");
+              case "title-asc":
+                return (a.dataset.title || "").localeCompare(b.dataset.title || "", "ja");
+              default: // date-desc
+                return (b.dataset.date || "").localeCompare(a.dataset.date || "");
+            }
+          });
+        }
+
+        function renderPagination(totalItems: number) {
+          if (!pagination) return;
+          const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+
+          if (totalPages <= 1) {
+            pagination.innerHTML = "";
+            return;
+          }
+
+          let html = `<button class="page-btn" data-page="prev" ${currentPage <= 1 ? "disabled" : ""}>←</button>`;
+          for (let i = 1; i <= totalPages; i++) {
+            html += `<button class="page-btn ${i === currentPage ? "active" : ""}" data-page="${i}">${i}</button>`;
+          }
+          html += `<button class="page-btn" data-page="next" ${currentPage >= totalPages ? "disabled" : ""}>→</button>`;
+
+          pagination.innerHTML = html;
+
+          pagination.querySelectorAll<HTMLButtonElement>(".page-btn").forEach((btn) => {
+            btn.addEventListener("click", () => {
+              const page = btn.dataset.page;
+              const totalPages = Math.ceil(getFilteredCards().length / ITEMS_PER_PAGE);
+              if (page === "prev" && currentPage > 1) currentPage--;
+              else if (page === "next" && currentPage < totalPages) currentPage++;
+              else if (page !== "prev" && page !== "next") currentPage = parseInt(page!);
+              applyFilters();
             });
           });
+        }
+
+        function applyFilters() {
+          const filtered = sortCards(getFilteredCards());
+          const start = (currentPage - 1) * ITEMS_PER_PAGE;
+          const end = start + ITEMS_PER_PAGE;
+
+          // Reorder DOM to reflect sort
+          if (grid) {
+            filtered.forEach((card) => grid.appendChild(card));
+            // Append non-filtered cards at the end (hidden)
+            cards.filter((c) => !filtered.includes(c)).forEach((card) => grid.appendChild(card));
+          }
+
+          cards.forEach((card) => card.classList.add("hidden-by-filter"));
+          filtered.forEach((card, i) => {
+            if (i >= start && i < end) {
+              card.classList.remove("hidden-by-filter");
+            }
+          });
+
+          // Show/hide no results message
+          if (noResults) {
+            noResults.classList.toggle("hidden", filtered.length > 0);
+          }
+          if (grid) {
+            grid.classList.toggle("hidden", filtered.length === 0);
+          }
+
+          renderPagination(filtered.length);
+        }
+
+        genreButtons.forEach((btn) => {
+          btn.addEventListener("click", () => {
+            currentGenre = btn.dataset.genre || "all";
+            currentPage = 1;
+            genreButtons.forEach((b) => b.classList.remove("active"));
+            btn.classList.add("active");
+            applyFilters();
+          });
         });
+
+        searchInput?.addEventListener("input", () => {
+          searchQuery = searchInput.value.trim();
+          currentPage = 1;
+          applyFilters();
+        });
+
+        sortSelect?.addEventListener("change", () => {
+          sortMode = sortSelect.value;
+          currentPage = 1;
+          applyFilters();
+        });
+
+        applyFilters();
       });
     </script>
   </main>

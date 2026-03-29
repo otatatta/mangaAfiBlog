@@ -4,12 +4,12 @@ series: "カグラバチ"
 cover_image: "https://books.google.com/books/content?id=0E0sEQAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"
 description: "妖刀をめぐる壮絶な戦いが新章へ突入。チヒロの覚悟と新たな敵の登場で物語が加速する。"
 pubDate: "2026-03-04"
-genre: "少年漫画"
+genre: "ダークファンタジー"
 author_name: "外薗健"
 publisher: "集英社"
 expectation_score: 4
 buzz_level: "中"
-tags: ["カグラバチ", "バトル", "ジャンプ", "妖刀"]
+tags: ["カグラバチ", "バトル", "ジャンプ", "妖刀", "ダークファンタジー"]
 seo_keywords: ["カグラバチ 12巻", "カグラバチ最新刊", "外薗健"]
 affiliate_url: "https://www.amazon.co.jp/dp/example4?tag=example-22"
 ---
